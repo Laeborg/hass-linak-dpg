@@ -4,5 +4,6 @@
   "documentation": "https://github.com/Laeborg/hass-linak-dpg",
   "dependencies": ["mqtt"],
   "codeowners": ["@Laeborg"],
-  "requirements": []
+  "requirements": [],
+  "config_flow": true
 }
