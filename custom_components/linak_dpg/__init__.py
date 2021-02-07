@@ -10,6 +10,11 @@ from homeassistant.components import mqtt
 
 import logging
 
+VERSION = '0.0.1'
+
+DOMAIN = 'linak_dpg'
+PLATFORMS = ['sensor']
+
 CONFIG_SCHEMA = vol.Schema({
     DOMAIN: vol.Schema({
         vol.Optional(CONF_NAME): cv.name,
