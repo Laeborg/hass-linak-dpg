@@ -8,9 +8,11 @@ from . import DOMAIN
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
     """Set up the sensor platform."""
+    
     # We only want this platform to be set up via discovery.
     if discovery_info is None:
         return
+        
     add_entities([LinakSensor()])
     
 class LinakSensor(Entity):
