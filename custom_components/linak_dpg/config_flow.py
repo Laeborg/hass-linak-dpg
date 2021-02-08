@@ -7,15 +7,19 @@ import voluptuous as vol
 
 from homeassistant import config_entries, core, exceptions
 
+import homeassistant.helpers.config_validation as cv
+
 from .const import DOMAIN
 from .hub import Hub
 
 _LOGGER = logging.getLogger(__name__)
 
-DATA_SCHEMA = vol.Schema({
-    ("name"): str,
-    ("address"): str
-})
+DATA_SCHEMA = vol.Schema(
+    {
+        vol.Required("name", default="Linak Desk"): cv.string,
+        vol.Required("address"): cv.string
+    }
+)
 
 
 async def validate_input(hass: core.HomeAssistant, data: dict):

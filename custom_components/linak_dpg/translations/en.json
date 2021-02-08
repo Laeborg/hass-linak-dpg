@@ -2,8 +2,9 @@
   "title": "Linak DPG Desk Panel",
   "config": {
     "step": {
-      "init": {
+      "user": {
         "title": "Connect your Linak DPG Desk Panel",
+        "description": "To connect to your Linak DPG Desk Panel enter name and MAC Address",
         "data": {
           "name": "Desk Name",
           "address": "MAC Address (00:11:22:33:44:55)"
