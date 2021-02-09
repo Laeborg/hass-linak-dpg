@@ -2,17 +2,14 @@
 Config Flow for Linak DPG Desk Panel Integration
 """
 
-import logging
 import voluptuous as vol
 
-from homeassistant import config_entries, core, exceptions
+from homeassistant import config_entries
+from homeassistant.exceptions import ConfigEntryNotReady
 
 import homeassistant.helpers.config_validation as cv
 
-from .const import DOMAIN
-from .hub import Hub
-
-_LOGGER = logging.getLogger(__name__)
+from .const import LOGGER, DOMAIN
 
 DATA_SCHEMA = vol.Schema(
     {
@@ -22,49 +19,49 @@ DATA_SCHEMA = vol.Schema(
 )
 
 
-async def validate_input(hass: core.HomeAssistant, data: dict):
-    if len(data["name"]) < 3:
-        raise InvalidName
+class LinakDPGConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+    """Handle a Linak DPG config flow."""
+    
+    def __init__(self):
+        """Initialize flow."""
+        self._address = None
+        self._name = None
+        self._id = None
         
-    if len(data["address"]) < 3:
-        raise InvalidAddress
+    def _get_entry(self):
+        data = {
+            "address": self._address,
+            "id": self._id,
+            "name": self._name
+        }
 
-    hub = Hub(hass, data["name"], data["address"])
-
-    result = await hub.init_connection()
-    if not result:
-        raise CannotConnect
-
-    return {
-        "title": data["name"],
-        "address": data["address"]
-    }
-
-
-class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    VERSION = 1
-    CONNECTION_CLASS = config_entries.CONN_CLASS_LOCAL_PUSH
+        return self.async_create_entry(
+            title=self._title,
+            data=data,
+        )
+        
+    def _try_connect(self):
+        """Try to connect."""
+        return True
+        
+    async def async_step_import(self, user_input=None):
+        """Handle configuration by yaml file."""
+        return await self.async_step_user(user_input)
 
     async def async_step_user(self, user_input=None):
-        errors = {}
-        
+        """Handle a flow initialized by the user."""
         if user_input is not None:
-            try:
-                info = await validate_input(self.hass, user_input)
+            await self.async_set_unique_id(user_input["address"])
+            self._abort_if_unique_id_configured()
 
-                return self.async_create_entry(title=info["title"], data=user_input)
-            except InvalidHost:
-                errors["host"] = "cannot_connect"
-            except Exception:
-                _LOGGER.exception("Unexpected exception")
-                errors["base"] = "unknown"
+            self._address = user_input.get("address")
+            self._name = user_input.get("name")
+            self._title = self._name
 
-        return self.async_show_form(
-            step_id="user", data_schema=DATA_SCHEMA, errors=errors
-        )
+            result = await self.hass.async_add_executor_job(self._try_connect)
 
-class InvalidName(exceptions.HomeAssistantError):
-    """Error to indicate there is an invalid name."""
-    
-class InvalidAddress(exceptions.HomeAssistantError):
-    """Error to indicate there is an invalid address."""
+            if result != True:
+                return self.async_abort(reason=result)
+            return self._get_entry()
+
+        return self.async_show_form(step_id="user", data_schema=DATA_SCHEMA)

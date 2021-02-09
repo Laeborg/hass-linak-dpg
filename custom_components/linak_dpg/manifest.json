@@ -1,6 +1,6 @@
 {
   "domain": "linak_dpg",
-  "name": "Linak DPG Desk Panel Integration",
+  "name": "Linak DPG Desk Panel",
   "documentation": "https://github.com/Laeborg/hass-linak-dpg",
   "dependencies": [],
   "codeowners": ["@Laeborg"],
