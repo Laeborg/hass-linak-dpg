@@ -20,7 +20,15 @@ class DeskSensor(Entity):
         self._config_entry = config_entry
         self._name = config_entry.data.get("name")
         self._uuid = config_entry.data.get("id")
-        self._state = random.randint(0, 100)
+        self._address = config_entry.data.get("address")
+        self._height = random.randint(60, 130)
+        self._unit_of_measurement = "cm"
+        self._availability = "Off"
+        
+        if self._availability == "Off":
+            self._state = self._availability
+        else:
+            self._state = self._height
         
     @property
     def unique_id(self) -> str:
@@ -33,6 +41,27 @@ class DeskSensor(Entity):
         return self._name
 
     @property
+    def address(self):
+        """Return the address of the device."""
+        return self._address
+
+    @property
     def state(self):
-        """Return the name of the device."""
+        """Return the state of the device."""
         return self._state
+
+    @property
+    def availability(self):
+        """Return the availability of the device."""
+        return self._availability
+        
+    @property
+    def device_state_attributes(self):
+        """Return the state attributes of the device."""
+        attr = {}
+        attr["height"] = self._height
+        attr["unit_of_measurement"] = self._unit_of_measurement
+        attr["mac_address"] = self._address
+        attr["availability"] = self._availability
+        
+        return attr
