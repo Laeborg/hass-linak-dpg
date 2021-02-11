@@ -19,6 +19,7 @@ sensor:
 ```
 
 ## Notable projects
+This integration is based on or inspired by the this projects:
 - nconrad's [idasen-desk-controller](https://github.com/nconrad/idasen-desk-controller)
 - kosme's [bluetoothctl_lib](https://github.com/kosme/bluetoothctl_lib)
 - castis' [bluetoothctl](https://gist.github.com/castis/0b7a162995d0b465ba9c84728e60ec01)
