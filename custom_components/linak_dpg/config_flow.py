@@ -69,7 +69,7 @@ class LinakDPGConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         except Exception as e:
             Bluetoothctl().stop_scan()
             LOGGER.error(e)
-            return e
+            return e.message
             
         else:
             Bluetoothctl().stop_scan()
@@ -82,6 +82,12 @@ class LinakDPGConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_user(self, user_input=None):
         """Handle a flow initialized by the user."""
         if user_input is not None:
+            if len(user_input["name"]) < 3:
+                raise Exception(f"Name must be atleast 3 characteres.")
+            
+            if re.match('^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$', user_input["address"]) is None:
+                raise Exception(f"MAC addreess is invalid.")
+            
             await self.async_set_unique_id(user_input["address"])
             self._abort_if_unique_id_configured()
 
