@@ -2,6 +2,8 @@
 Config Flow for Linak DPG Desk Panel Integration
 """
 
+import time
+
 import voluptuous as vol
 
 from homeassistant import config_entries
@@ -10,6 +12,7 @@ from homeassistant.exceptions import ConfigEntryNotReady
 import homeassistant.helpers.config_validation as cv
 
 from .const import LOGGER, DOMAIN
+from .bluetoothctl import Bluetoothctl
 
 DATA_SCHEMA = vol.Schema(
     {
@@ -42,7 +45,35 @@ class LinakDPGConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         
     def _try_connect(self):
         """Try to connect."""
-        return True
+        try:
+            Bluetoothctl().start_scan()
+            time.sleep(4)
+            
+            info = Bluetoothctl().get_device_info(self._address);
+            
+            if "not available" not in info[1]:
+                pair = Bluetoothctl().pair(self._address)
+            
+                if pair:
+                    connection = Bluetoothctl().connect(self._address)
+                    
+                    if not connection:
+                        raise Exception(f"Failed to establish connection")
+                        
+                else:
+                    raise Exception(f"Pairing failed")
+                    
+            else:
+                raise Exception(f"Desk unavailable")
+                
+        except Exception as e:
+            Bluetoothctl().stop_scan()
+            LOGGER.error(e)
+            return e
+            
+        else:
+            Bluetoothctl().stop_scan()
+            return True
         
     async def async_step_import(self, user_input=None):
         """Handle configuration by yaml file."""

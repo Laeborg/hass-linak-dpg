@@ -7,7 +7,6 @@ https://github.com/Laeborg/hass-linak-dpg
 
 from .const import DOMAIN
 
-
 async def async_setup(hass, config):
     """Set up the Linak DPG component."""
     if DOMAIN in config:

@@ -5,7 +5,8 @@ Platform for Linak DPG Desk Panel Integration
 import random
 
 from homeassistant.helpers.entity import Entity
-from .const import DOMAIN
+from .const import DOMAIN, LOGGER
+from .bluetoothctl import Bluetoothctl
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up the Linak DPG desk from a config entry."""
@@ -24,11 +25,7 @@ class DeskSensor(Entity):
         self._height = random.randint(60, 130)
         self._unit_of_measurement = "cm"
         self._availability = "Off"
-        
-        if self._availability == "Off":
-            self._state = self._availability
-        else:
-            self._state = self._height
+        self._state = state()
         
     @property
     def unique_id(self) -> str:
@@ -48,7 +45,12 @@ class DeskSensor(Entity):
     @property
     def state(self):
         """Return the state of the device."""
-        return self._state
+        connection = Bluetoothctl().connect(self._address)
+        
+        if connection:
+            return True
+            
+        return False
 
     @property
     def availability(self):
