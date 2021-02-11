@@ -3,7 +3,9 @@ Home Assistant integration to control Linak DPG Desk Panels with adjustable heig
 
 🛠️ **This project is work-in-progress and not ready for use** 🛠️
 
-## Configuration
+## Installation
+Upload the custom component to Home Assistant's custom_components directory and restart the service.
+
 ### Recommended configuration
 Add the integration though interface of HomeAssistant
 
@@ -15,3 +17,8 @@ sensor:
     name: Linak Desk
     address: 00:11:22:33:44:55
 ```
+
+## Notable projects
+(idasen-desk-controller)[https://github.com/nconrad/idasen-desk-controller] by nconrad
+(bluetoothctl_lib)[https://github.com/kosme/bluetoothctl_lib] by kosme
+(bluetoothctl updated)[https://gist.github.com/castis/0b7a162995d0b465ba9c84728e60ec01] by castis
