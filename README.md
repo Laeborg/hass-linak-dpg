@@ -1,5 +1,5 @@
 # Linak DPG Desk Panel Integration
-Home Assistant integration to control Linak DPG Desk Panels with adjustable heights. The integration uses a custom bluetoothctl wrapper and does not require pybluez. The integration is developed with focus on Home Assistant OS and is not requiring other server tools.
+Home Assistant integration to control Linak DPG Desk Panels (eg. IKEA IDÅSEN or DENCON) with adjustable heights. The integration uses a custom bluetoothctl wrapper and does not require pybluez. The integration is developed with focus on Home Assistant OS and is not requiring other server tools.
 
 The project is work in progress.
 
