@@ -12,7 +12,7 @@ from homeassistant.exceptions import ConfigEntryNotReady
 import homeassistant.helpers.config_validation as cv
 
 from .const import LOGGER, DOMAIN
-from .bluetoothctl import Bluetoothctl
+from .btctl import BTctl
 
 DATA_SCHEMA = vol.Schema(
     {
@@ -46,16 +46,16 @@ class LinakDPGConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     def _try_connect(self):
         """Try to connect."""
         try:
-            Bluetoothctl().start_scan()
-            time.sleep(4)
+            wrapper = BTctl()
+            wrapper.scan_start()
             
-            info = Bluetoothctl().get_device_info(self._address);
+            info = wrapper.device_info(self._address);
             
-            if "not available" not in info[1]:
-                pair = Bluetoothctl().pair(self._address)
+            if info:
+                pair = wrapper.pair(self._address)
             
                 if pair:
-                    connection = Bluetoothctl().connect(self._address)
+                    connection = wrapper.connect(self._address)
                     
                     if not connection:
                         raise Exception(f"Failed to establish connection")
@@ -67,12 +67,11 @@ class LinakDPGConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 raise Exception(f"Desk unavailable")
                 
         except Exception as e:
-            Bluetoothctl().stop_scan()
-            LOGGER.error(e)
+            wrapper.scan_stop()
             return e.message
             
         else:
-            Bluetoothctl().stop_scan()
+            wrapper.scan_stop()
             return True
         
     async def async_step_import(self, user_input=None):
@@ -86,7 +85,7 @@ class LinakDPGConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 raise Exception(f"Name must be atleast 3 characteres.")
             
             if re.match('^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$', user_input["address"]) is None:
-                raise Exception(f"MAC addreess is invalid.")
+                raise Exception(f"MAC address is invalid.")
             
             await self.async_set_unique_id(user_input["address"])
             self._abort_if_unique_id_configured()

@@ -10,16 +10,20 @@ from homeassistant.const import (
     STATE_ON,
 )
 
-from .const import DOMAIN, LOGGER
-from .bluetoothctl import Bluetoothctl
+from .const import (
+    DOMAIN,
+    LOGGER,
+    HEIGHT_CHAR_ID
+)
+from .btctl import BTctl
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
-    """Set up the Linak DPG desk from a config entry."""
+    """Set up the Linak DPG Desk from a config entry."""
 
     async_add_entities([DeskSensor(config_entry)])
 
 class DeskSensor(Entity):
-    """Representation of Height Sensor for Linak DPG."""
+    """Representation of Height Sensor for Linak Desk."""
     
     def __init__(self, config_entry):
         """Initialize the Linak DPG desk."""
@@ -27,25 +31,39 @@ class DeskSensor(Entity):
         self._name = config_entry.data.get("name")
         self._uuid = config_entry.data.get("id")
         self._address = config_entry.data.get("address")
-        self._height = self.height
+        self._state = STATE_OFF
+        self._height = None
         self._unit_of_measurement = "cm"
-        self._state = None
         
     def update(self):
         """Update state of the device."""
         try:
-            connection = Bluetoothctl().connect(self._address)
+            wrapper = BTctl()
+            wrapper.connect(self._address)
             
-            if not connection:
-                raise Exception(f"Failed to establish connection")
+            if wrapper.gatt():
+                output = wrapper.attribute_read_value(HEIGHT_CHAR_ID)
                 
-        except Exception as e:
-            LOGGER.error(e)
+        except:
             self._state = STATE_OFF
             
         else:
-            self._state = STATE_ON
-        
+            if output:
+                hex_arr = []
+                
+                for value in output[-1].split(" "):
+                    if value.strip():
+                        if not value.endswith("..."):
+                            hex_arr.append(value)
+                        
+                better_arr = " ".join(hex_arr).encode()
+
+                val = BTctl().convertHexStr(better_arr[0:5])
+                
+                if val:
+                    self._state = float(val) / 100
+                    self._height = self._state
+            
     @property
     def unique_id(self) -> str:
         """Return the unique ID of the device."""
@@ -65,11 +83,6 @@ class DeskSensor(Entity):
     def address(self):
         """Return the address of the device."""
         return self._address
-        
-    @property
-    def height(self):
-        """Return the current height of the device."""
-        return random.randint(60, 130)
         
     @property
     def device_state_attributes(self):
