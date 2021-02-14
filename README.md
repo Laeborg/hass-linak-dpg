@@ -8,6 +8,7 @@ The project is work in progress.
 - Current height
 
 ### Pending
+- Device selection under installation
 - Offset
 - Move up/move down
 - Stop moving
