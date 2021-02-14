@@ -33,6 +33,7 @@ class DeskSensor(Entity):
         self._address = config_entry.data.get("address")
         self._state = STATE_OFF
         self._height = None
+        self._offset = 70
         self._unit_of_measurement = "cm"
         
     def update(self):
@@ -62,7 +63,7 @@ class DeskSensor(Entity):
                 
                 if val:
                     self._state = float(val) / 100
-                    self._height = self._state
+                    self._height = self._state + self._offset
             
     @property
     def unique_id(self) -> str:
@@ -80,6 +81,11 @@ class DeskSensor(Entity):
         return self._state
 
     @property
+    def offset(self):
+        """Return the offset of the device."""
+        return self._offset
+
+    @property
     def address(self):
         """Return the address of the device."""
         return self._address
@@ -89,6 +95,7 @@ class DeskSensor(Entity):
         """Return the state attributes of the device."""
         attr = {}
         attr["height"] = self._height
+        attr["offset"] = self._offset
         attr["unit_of_measurement"] = self._unit_of_measurement
         attr["mac_address"] = self._address
         
